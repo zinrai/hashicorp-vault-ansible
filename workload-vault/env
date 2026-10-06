@@ -1,0 +1,13 @@
+# Sourced, not run, in this directory: it sets up the calling shell, and
+# VAULT_CACERT is found from where it is sourced.
+#
+# The load balancer, not a node: the vault CLI must reach whichever node is
+# active. vault-ceremony reads the cluster from the directory it runs in.
+export VAULT_ADDR=https://10.0.40.15:8200
+export VAULT_CACERT="$PWD/ca/root.crt"
+# One keyring for both clusters, not one each: the same people hold keys
+# to both.
+export PGP_PERSONAS_KEYRING="$(dirname "$PWD")/keyring"
+# mkcert's CA in this cluster's directory, not the user's: each cluster
+# has its own.
+export CAROOT="$PWD/ca"

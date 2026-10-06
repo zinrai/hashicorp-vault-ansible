@@ -1,0 +1,6 @@
+---
+vault_conf:
+  cluster_name: "workload-vault"
+  servers: "{{ groups['workload_vault'] }}"
+  load_balancers: "{{ groups['workload_vault_lb'] }}"
+  enable_unauthenticated_access: []

@@ -1,0 +1,38 @@
+# No secrets engines or AppRoles: only what needs recovery keys or the
+# initial root token is declared here. Operators add the rest with the
+# vault CLI.
+
+# By IP, not hostname: node certificates name IPs only, as in Foundation.
+nodes:
+  - name: workload-vault-0
+    ip: 10.0.40.20
+  - name: workload-vault-1
+    ip: 10.0.40.21
+  - name: workload-vault-2
+    ip: 10.0.40.22
+
+# Recovery keys, not unseal keys: the seal unseals this cluster. Holders are
+# still needed to generate a root token or rekey.
+threshold: 3
+holders:
+  - alice
+  - bob
+  - carol
+  - safe-hq
+  - safe-dc2
+
+root_token_holder: alice
+
+operators:
+  - name: alice
+    policies: [admin]
+  - name: bob
+    policies: [admin]
+  - name: carol
+    policies: [admin]
+
+audit:
+  - path: file
+    type: file
+    options:
+      file_path: /var/log/vault/audit.log

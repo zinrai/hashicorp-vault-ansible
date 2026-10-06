@@ -1,0 +1,3 @@
+---
+haproxy_conf:
+  servers: "{{ groups['workload_vault'] }}"

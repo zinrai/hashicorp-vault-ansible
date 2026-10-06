@@ -1,0 +1,5 @@
+---
+# vault_seal_dev, not the role's name: Jinja reads a hyphen as a minus.
+vault_seal_dev:
+  version: "0.2.0"
+  bin: "/usr/local/bin/vault-seal-dev"

@@ -1,0 +1,9 @@
+# Transit, not a KMS's own seal type: the seal beside the node answers
+# Vault's transit API. A Unix socket, not loopback TCP, so that only the
+# vault group can ask for a decryption.
+seal "transit" {
+  address         = "unix:///run/vault-seal/kms.sock"
+  mount_path      = "transit/"
+  key_name        = "dev"
+  disable_renewal = "true"
+}

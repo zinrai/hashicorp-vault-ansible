@@ -1,0 +1,95 @@
+---
+# root:vault, not the vault:vault the package leaves: Vault reads its
+# configuration and must not be able to change it.
+- name: Ensure vault configuration directory is read-only to vault
+  ansible.builtin.file:
+    path: "/etc/vault.d"
+    state: directory
+    owner: root
+    group: vault
+    mode: "0750"
+  tags:
+    - vault_conf
+
+- name: Ensure vault configuration is set
+  ansible.builtin.template:
+    src: "etc/vault.d/vault.hcl.j2"
+    dest: "/etc/vault.d/vault.hcl"
+    owner: root
+    group: vault
+    mode: "0640"
+  notify:
+    - reload vault
+  tags:
+    - vault_conf
+
+- name: Ensure vault unit drop-in directory exists
+  ansible.builtin.file:
+    path: "/etc/systemd/system/vault.service.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  tags:
+    - vault_conf
+
+# No handler: vault_enable reloads systemd. A running Vault keeps its
+# command line until the operator restarts it.
+- name: Ensure vault reads its configuration directory
+  ansible.builtin.template:
+    src: "etc/systemd/system/vault.service.d/config-dir.conf.j2"
+    dest: "/etc/systemd/system/vault.service.d/config-dir.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - vault_conf
+
+# In /etc/vault.d/tls, not over the self-signed pair the package makes in
+# /opt/vault/tls: what was placed here and what the package made stay
+# apart. Issued by the offline CA, not here: Ansible only places them.
+- name: Ensure vault TLS directory exists
+  ansible.builtin.file:
+    path: "/etc/vault.d/tls"
+    state: directory
+    owner: root
+    group: vault
+    mode: "0750"
+  tags:
+    - vault_conf
+
+- name: Ensure vault TLS certificate, key and CA certificate are in place
+  ansible.builtin.copy:
+    src: "{{ inventory_hostname }}/etc/vault.d/tls/{{ item }}"
+    dest: "/etc/vault.d/tls/{{ item }}"
+    owner: root
+    group: vault
+    mode: "0640"
+  loop:
+    - server.crt
+    - server.key
+    - ca.crt
+  notify:
+    - reload vault
+  tags:
+    - vault_conf
+
+- name: Ensure vault audit log directory exists
+  ansible.builtin.file:
+    path: "/var/log/vault"
+    state: directory
+    owner: vault
+    group: vault
+    mode: "0750"
+  tags:
+    - vault_conf
+
+- name: Ensure vault audit log is rotated
+  ansible.builtin.template:
+    src: "etc/logrotate.d/vault.j2"
+    dest: "/etc/logrotate.d/vault"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - vault_conf

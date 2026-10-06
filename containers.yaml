@@ -1,0 +1,64 @@
+containers:
+  - name: foundation-vault-lb
+    lxc_create_args: -t debian -- -r trixie -a amd64
+    networks:
+      - type: veth
+        interface: vault0
+        ipv4_address: 10.0.40.5/24
+        ipv4_gateway: 10.0.40.1
+
+  - name: foundation-vault-0
+    lxc_create_args: -t debian -- -r trixie -a amd64
+    networks:
+      - type: veth
+        interface: vault0
+        ipv4_address: 10.0.40.10/24
+        ipv4_gateway: 10.0.40.1
+
+  - name: foundation-vault-1
+    lxc_create_args: -t debian -- -r trixie -a amd64
+    networks:
+      - type: veth
+        interface: vault0
+        ipv4_address: 10.0.40.11/24
+        ipv4_gateway: 10.0.40.1
+
+  - name: foundation-vault-2
+    lxc_create_args: -t debian -- -r trixie -a amd64
+    networks:
+      - type: veth
+        interface: vault0
+        ipv4_address: 10.0.40.12/24
+        ipv4_gateway: 10.0.40.1
+
+  - name: workload-vault-lb
+    lxc_create_args: -t debian -- -r trixie -a amd64
+    networks:
+      - type: veth
+        interface: vault0
+        ipv4_address: 10.0.40.15/24
+        ipv4_gateway: 10.0.40.1
+
+  - name: workload-vault-0
+    lxc_create_args: -t debian -- -r trixie -a amd64
+    networks:
+      - type: veth
+        interface: vault0
+        ipv4_address: 10.0.40.20/24
+        ipv4_gateway: 10.0.40.1
+
+  - name: workload-vault-1
+    lxc_create_args: -t debian -- -r trixie -a amd64
+    networks:
+      - type: veth
+        interface: vault0
+        ipv4_address: 10.0.40.21/24
+        ipv4_gateway: 10.0.40.1
+
+  - name: workload-vault-2
+    lxc_create_args: -t debian -- -r trixie -a amd64
+    networks:
+      - type: veth
+        interface: vault0
+        ipv4_address: 10.0.40.22/24
+        ipv4_gateway: 10.0.40.1

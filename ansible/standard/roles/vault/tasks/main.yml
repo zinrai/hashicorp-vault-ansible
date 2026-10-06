@@ -1,0 +1,22 @@
+---
+- name: Ensure vault version is pinned
+  ansible.builtin.template:
+    src: "etc/apt/preferences.d/vault.j2"
+    dest: "/etc/apt/preferences.d/vault"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - vault
+
+# The package does not restart Vault on upgrade, and nothing here does
+# either: a restarted Shamir node stays sealed until its holders unseal it.
+# update_cache here, not only in apt_update: that ran before the HashiCorp
+# repository was added.
+- name: Ensure vault is installed
+  ansible.builtin.apt:
+    name: "vault={{ vault.version }}*"
+    state: present
+    update_cache: true
+  tags:
+    - vault

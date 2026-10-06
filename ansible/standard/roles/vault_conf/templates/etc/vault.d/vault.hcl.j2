@@ -1,0 +1,52 @@
+cluster_name = "{{ vault_conf.cluster_name }}"
+
+# No UI: one less surface, and nothing here needs a browser.
+ui = false
+
+# mlock off, not on: Integrated Storage memory-maps its database, which
+# does not mix with mlock. Swap is disabled on the host instead, as
+# HashiCorp advises for Raft.
+disable_mlock = true
+
+# Empty but for break-glass: generate-root and rekey stay behind a token, as
+# Vault 2.x has them. Whoever can start or cancel them without one can
+# cancel every attempt, so that no ceremony ever completes (CVE-2026-5807).
+# generate-root alone, while nobody can log in to start one, then empty
+# again.
+enable_unauthenticated_access = {{ vault_conf.enable_unauthenticated_access | to_json }}
+
+api_addr     = "https://{{ ansible_host }}:8200"
+cluster_addr = "https://{{ ansible_host }}:8201"
+
+storage "raft" {
+  path    = "/opt/vault/data"
+  node_id = "{{ inventory_hostname }}"
+
+  # By IP, not hostname: this cluster must come up before DNS does.
+{% for host in vault_conf.servers if host != inventory_hostname %}
+  retry_join {
+    leader_api_addr     = "https://{{ hostvars[host].ansible_host }}:8200"
+    leader_ca_cert_file = "/etc/vault.d/tls/ca.crt"
+  }
+{% endfor %}
+}
+
+# Certificates come from an offline root CA, not from Vault's own PKI:
+# Vault cannot depend on a service that depends on Vault.
+listener "tcp" {
+  address         = "{{ ansible_host }}:8200"
+  cluster_address = "{{ ansible_host }}:8201"
+  tls_cert_file   = "/etc/vault.d/tls/server.crt"
+  tls_key_file    = "/etc/vault.d/tls/server.key"
+  tls_min_version = "tls13"
+
+  # The client's address from the load balancer's PROXY header, not the
+  # load balancer's own: the audit log must name who asked. Connections
+  # from anywhere else, such as vault-ceremony and the other nodes, carry
+  # no header and keep their own address.
+  proxy_protocol_behavior         = "allow_authorized"
+  proxy_protocol_authorized_addrs = "{{ vault_conf.load_balancers | map('extract', hostvars, 'ansible_host') | join(',') }}"
+}
+
+# No seal stanza here, so Shamir unless a seal role adds seal.hcl: no KMS
+# or HSM that could be down when a cluster without one must come up.

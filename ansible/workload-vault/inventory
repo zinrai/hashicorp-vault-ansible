@@ -1,0 +1,10 @@
+[workload_vault]
+workload-vault-0 ansible_host=10.0.40.20
+workload-vault-1 ansible_host=10.0.40.21
+workload-vault-2 ansible_host=10.0.40.22
+
+[workload_vault_lb]
+workload-vault-lb ansible_host=10.0.40.15
+
+[all:vars]
+ansible_user=root

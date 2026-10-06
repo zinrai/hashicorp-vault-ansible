@@ -1,0 +1,23 @@
+[Unit]
+Description=vault-seal-dev (transit seal for Vault, development only)
+Documentation=https://github.com/zinrai/vault-seal-dev
+
+[Service]
+ExecStart={{ vault_seal_dev.bin }} -socket /run/vault-seal/kms.sock
+User=vault-seal-dev
+# The vault group, not the seal user's own: the socket takes the process's
+# group, and Vault reaches it through that group.
+Group=vault
+RuntimeDirectory=vault-seal
+RuntimeDirectoryMode=0750
+LoadCredential=key.gpg:/etc/vault-seal-dev/key.gpg
+Environment=VAULT_SEAL_DEV_KEY=%d/key.gpg
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

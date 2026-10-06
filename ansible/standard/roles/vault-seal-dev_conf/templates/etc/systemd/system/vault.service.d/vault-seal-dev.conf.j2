@@ -1,0 +1,5 @@
+# Wants, not Requires: a running Vault does not need its seal, so stopping
+# the seal must not stop Vault.
+[Unit]
+Wants=vault-seal-dev.service
+After=vault-seal-dev.service

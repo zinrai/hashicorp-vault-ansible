@@ -1,0 +1,9 @@
+---
+- name: Ensure vault is enabled and started
+  ansible.builtin.systemd:
+    name: vault
+    enabled: true
+    state: started
+    daemon_reload: true
+  tags:
+    - vault_enable

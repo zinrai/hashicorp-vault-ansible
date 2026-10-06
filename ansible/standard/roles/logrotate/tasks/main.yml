@@ -1,0 +1,7 @@
+---
+- name: Ensure logrotate is installed
+  ansible.builtin.apt:
+    name: logrotate
+    state: present
+  tags:
+    - logrotate

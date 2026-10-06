@@ -1,0 +1,10 @@
+---
+# Reloaded, not restarted: a restarted Shamir node stays sealed until its
+# holders unseal it, while SIGHUP applies the certificates and most of
+# vault.hcl to a running node.
+- name: reload vault
+  ansible.builtin.systemd:
+    name: vault
+    state: reloaded
+  tags:
+    - vault

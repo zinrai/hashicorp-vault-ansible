@@ -1,0 +1,7 @@
+---
+- name: Ensure haproxy is installed
+  ansible.builtin.apt:
+    name: haproxy
+    state: present
+  tags:
+    - haproxy

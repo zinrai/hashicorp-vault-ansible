@@ -1,0 +1,10 @@
+[foundation_vault]
+foundation-vault-0 ansible_host=10.0.40.10
+foundation-vault-1 ansible_host=10.0.40.11
+foundation-vault-2 ansible_host=10.0.40.12
+
+[foundation_vault_lb]
+foundation-vault-lb ansible_host=10.0.40.5
+
+[all:vars]
+ansible_user=root

@@ -1,0 +1,25 @@
+---
+- name: Ensure Vault CA certificate is in place for health checks
+  ansible.builtin.copy:
+    src: "{{ inventory_hostname }}/etc/haproxy/vault-ca.crt"
+    dest: "/etc/haproxy/vault-ca.crt"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - reload haproxy
+  tags:
+    - haproxy_conf
+
+- name: Ensure haproxy configuration is set
+  ansible.builtin.template:
+    src: "etc/haproxy/haproxy.cfg.j2"
+    dest: "/etc/haproxy/haproxy.cfg"
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "haproxy -c -f %s"
+  notify:
+    - reload haproxy
+  tags:
+    - haproxy_conf

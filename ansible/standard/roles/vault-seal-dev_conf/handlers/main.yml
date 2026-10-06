@@ -1,0 +1,10 @@
+---
+# Restarting the seal is safe, unlike Vault: a running Vault does not need
+# its seal until it next starts.
+- name: restart vault-seal-dev
+  ansible.builtin.systemd:
+    name: vault-seal-dev
+    state: restarted
+    daemon_reload: true
+  tags:
+    - vault-seal-dev_conf

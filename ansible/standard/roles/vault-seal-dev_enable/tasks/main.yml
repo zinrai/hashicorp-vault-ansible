@@ -1,0 +1,9 @@
+---
+- name: Ensure vault-seal-dev is enabled and started
+  ansible.builtin.systemd:
+    name: vault-seal-dev
+    enabled: true
+    state: started
+    daemon_reload: true
+  tags:
+    - vault-seal-dev_enable

@@ -1,0 +1,8 @@
+# One bridge, not one per cluster: netshed routes between bridges, so a
+# second bridge would not keep the clusters apart.
+networks:
+  - name: "vault0"
+    type: "bridge"
+    subnet: "10.0.40.0/24"
+    gateway: "10.0.40.1/24"
+    masquerade: true

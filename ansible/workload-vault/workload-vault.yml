@@ -1,0 +1,21 @@
+---
+# All nodes at once, not serial: 1: nothing here restarts Vault, so the
+# Raft quorum is never at stake. The seal before vault_enable: Vault does
+# not start while its seal is unreachable.
+- hosts: workload_vault
+  become: true
+  roles:
+    - apt_update
+    - ca-certificates
+    - apt_hashicorp_repository
+    - logrotate
+    - vault_conf
+    - vault-seal-dev_conf
+    - vault-seal-dev_enable
+    - vault_enable
+
+- hosts: workload_vault_lb
+  become: true
+  roles:
+    - apt_update
+    - haproxy_conf

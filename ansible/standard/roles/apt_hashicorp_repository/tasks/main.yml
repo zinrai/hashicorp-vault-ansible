@@ -1,0 +1,21 @@
+---
+- name: Ensure HashiCorp apt signing key is installed
+  ansible.builtin.get_url:
+    url: "{{ apt_hashicorp_repository.key_url }}"
+    dest: "{{ apt_hashicorp_repository.keyring }}"
+    mode: "0644"
+    force: false
+  tags:
+    - apt_hashicorp_repository
+
+# A template, not the apt_repository module: the module needs gpg on the
+# host, which apt itself does not.
+- name: Ensure HashiCorp apt repository is configured
+  ansible.builtin.template:
+    src: "etc/apt/sources.list.d/hashicorp.sources.j2"
+    dest: "/etc/apt/sources.list.d/hashicorp.sources"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - apt_hashicorp_repository

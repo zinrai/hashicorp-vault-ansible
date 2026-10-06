@@ -1,0 +1,59 @@
+---
+- name: Ensure vault-seal-dev key directory exists
+  ansible.builtin.file:
+    path: "/etc/vault-seal-dev"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  tags:
+    - vault-seal-dev_conf
+
+# root only, not the seal's user: systemd hands it to the seal as a
+# credential, so no other process running as that user can read it.
+- name: Ensure vault-seal-dev key is in place
+  ansible.builtin.copy:
+    src: "{{ inventory_hostname }}/etc/vault-seal-dev/key.gpg"
+    dest: "/etc/vault-seal-dev/key.gpg"
+    owner: root
+    group: root
+    mode: "0400"
+  notify:
+    - restart vault-seal-dev
+  tags:
+    - vault-seal-dev_conf
+
+- name: Ensure vault-seal-dev systemd unit is installed
+  ansible.builtin.template:
+    src: "etc/systemd/system/vault-seal-dev.service.j2"
+    dest: "/etc/systemd/system/vault-seal-dev.service"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - restart vault-seal-dev
+  tags:
+    - vault-seal-dev_conf
+
+# No handler: vault_enable reloads systemd.
+- name: Ensure vault starts after vault-seal-dev
+  ansible.builtin.template:
+    src: "etc/systemd/system/vault.service.d/vault-seal-dev.conf.j2"
+    dest: "/etc/systemd/system/vault.service.d/vault-seal-dev.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - vault-seal-dev_conf
+
+# No handler: Vault reads its seal at start only, and when to restart a
+# node is the operator's call.
+- name: Ensure vault seal configuration is set
+  ansible.builtin.template:
+    src: "etc/vault.d/seal.hcl.j2"
+    dest: "/etc/vault.d/seal.hcl"
+    owner: root
+    group: vault
+    mode: "0640"
+  tags:
+    - vault-seal-dev_conf

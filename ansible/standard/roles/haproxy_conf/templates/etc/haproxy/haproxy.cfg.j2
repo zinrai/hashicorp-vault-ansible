@@ -1,0 +1,32 @@
+global
+  log /dev/log local0
+  chroot /var/lib/haproxy
+  stats socket /run/haproxy/admin.sock mode 660 level admin
+  user haproxy
+  group haproxy
+  daemon
+
+# TCP, not HTTP: TLS goes through to the nodes, so the load balancer holds
+# no certificate and no key.
+defaults
+  mode tcp
+  log global
+  option tcplog
+  timeout connect 5s
+  timeout client 5m
+  timeout server 5m
+
+frontend vault
+  bind :8200
+  default_backend active
+
+# The active node only, not every node that accepts connections: a sealed
+# node accepts them too, and a standby would only forward to the active
+# one. The PROXY header carries the client's address, for the audit log.
+backend active
+  option httpchk GET /v1/sys/health
+  http-check expect status 200
+  default-server check inter 2s fall 2 rise 2 check-ssl verify required ca-file /etc/haproxy/vault-ca.crt send-proxy-v2 check-send-proxy
+{% for host in haproxy_conf.servers %}
+  server {{ host }} {{ hostvars[host].ansible_host }}:8200
+{% endfor %}

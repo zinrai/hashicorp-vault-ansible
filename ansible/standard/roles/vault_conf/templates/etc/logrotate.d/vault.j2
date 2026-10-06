@@ -1,0 +1,13 @@
+# SIGHUP, not copytruncate: Vault reopens its audit file on reload, while
+# copytruncate loses what is written between the copy and the truncate.
+/var/log/vault/*.log {
+  daily
+  rotate 7
+  compress
+  delaycompress
+  missingok
+  notifempty
+  postrotate
+    systemctl reload vault
+  endscript
+}

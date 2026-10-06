@@ -1,0 +1,20 @@
+# Not committed, though in production root.crt may be: each test bed makes
+# its own CA. root.key never leaves the offline machine.
+/*/ca/
+
+# Not committed: encrypted, but not public either.
+/*/state/
+
+# Not committed, though in production pubkeys/ is: each test bed makes its
+# own keys.
+/*/pubkeys/
+/keyring/
+
+# Not committed: the development seal's key.
+/workload-vault/seal-key/
+
+# Not committed: what the playbooks place on each host, issued by the CA or
+# made by pgp-personas for this test bed.
+/ansible/standard/roles/vault_conf/files/
+/ansible/standard/roles/haproxy_conf/files/
+/ansible/standard/roles/vault-seal-dev_conf/files/
